@@ -1,0 +1,42 @@
+const express = require('express')
+const expressLogger = require('express-bunyan-logger')
+const bodyParser = require('body-parser')
+
+import { config, logger, metrics } from './shared'
+import * as routes from './routes'
+
+import * as path from 'path'
+import * as swaggerValidator from 'express-ajv-swagger-validation'
+
+// WARNING: in prod environment, make sure you set NODE_ENV environment variable to production
+// otherwise you will pay with performance penalties
+// see https://www.dynatrace.com/blog/the-drastic-effects-of-omitting-node_env-in-your-express-js-applications/ for
+// more details
+
+const setup = async() => {
+  await swaggerValidator.init(path.join(__dirname, 'swagger.yaml'))
+  const app = require('express')()
+
+  app.use(
+    expressLogger({
+      name: '<%= props.component %>',
+      format: ':remote-address :incoming :method :url :status-code :res-headers[content-length] - :response-time ms',
+      excludes: '*',
+      streams: [{ level: config('LOG_LEVEL'), stream: process.stdout }],
+    })
+  )
+
+  app.use('/', routes.setupRoutes(swaggerValidator))
+
+  app.use((err, req, res, next) => {
+    if (err instanceof swaggerValidator.InputValidationError) {
+      res.status(400).json({ more_info: JSON.stringify(err.errors) })
+    }
+  })
+
+  return app
+}
+
+export {
+  setup
+}

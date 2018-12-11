@@ -1,0 +1,58 @@
+import * as path from 'path'
+import * as bunyan from 'bunyan'
+import * as fs from 'fs'
+
+import config from './config'
+
+/**
+ * Proxies a stream to write level names instead of numbers. Writing levels as a number and breaks in fluentd
+ */
+const wrappedStream = (stream) => {
+  return {
+    write: (entry) => {
+      const json = JSON.parse(entry)
+      json.level = bunyan.nameFromLevel[json.level]
+
+      // Write to the stream with a \n so that fluentd picks it up.
+      stream.write(JSON.stringify(json) + '\n')
+    }
+  }
+}
+
+let streams: any
+
+if (config('LOG_FILE')) {
+  streams = [{
+    stream: wrappedStream(fs.createWriteStream(config('LOG_FILE'), { flags: 'a', encoding: 'utf8' })),
+    level: config('LOG_LEVEL')
+  }]
+} else {
+  streams = [{
+    stream: wrappedStream(process.stdout),
+    level: config('LOG_LEVEL')
+  }]
+}
+
+const logger = bunyan.createLogger({
+  name: '<%= props.system %>/<%= props.component %>',
+  stream: process.stdout,
+  level: config('LOG_LEVEL'),
+})
+
+const childLogger = (filename) => {
+  const relativeFilename = path.relative(`${__dirname}/..`, filename)
+  const parts = path.dirname(relativeFilename).split(path.sep)
+
+  parts.push(path.basename(relativeFilename, path.extname(relativeFilename)))
+  
+  return logger.child({
+    logger: parts.join('#')
+  })
+}
+
+export default logger
+
+export {
+  childLogger
+}
+

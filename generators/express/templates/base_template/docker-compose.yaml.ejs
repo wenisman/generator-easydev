@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+
+  <%= props.component %>:
+    image: node:latest
+    working_dir: /app
+    volumes:
+      - $PROJECT_ROOT:/app
+      - /app/node_modules
+    environment:
+      - TZ=UTC
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+

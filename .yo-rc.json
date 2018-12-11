@@ -1,0 +1,9 @@
+{
+  "generator-node": {
+    "promptValues": {
+      "authorName": "Geoffrey Tsai",
+      "authorEmail": "wenisman@hotmail.com",
+      "authorUrl": "https://github.com/wenisman"
+    }
+  }
+}

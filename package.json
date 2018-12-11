@@ -1,0 +1,55 @@
+{
+  "name": "generator-easydev",
+  "version": "0.0.1",
+  "description": "An easy but full featured genetator.",
+  "homepage": "https://github.com/wenisman",
+  "author": {
+    "name": "Geoffrey Tsai"
+  },
+  "files": [
+    "generators",
+    "README.md"
+  ],
+  "main": "generators/index.js",
+  "keywords": [
+    "",
+    "yeoman-generator"
+  ],
+  "devDependencies": {
+    "conventional-changelog-cli": "^2.0.0",
+    "eslint": "^4.19.1",
+    "eslint-config-xo-space": "^0.16.0",
+    "jest": "^19.0.2",
+    "jest-cli": "^20.0.0",
+    "np": "^3.0.1",
+    "nsp": "^3.2.1",
+    "yeoman-assert": "^3.1.1",
+    "yeoman-test": "^1.7.2"
+  },
+  "dependencies": {
+    "chalk": "^1.1.3",
+    "yeoman-generator": "^2.0.5",
+    "yosay": "^2.0.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/**/*.js"
+    ]
+  },
+  "scripts": {
+    "pretest": "eslint . --fix",
+    "bump": "npm run np && npm run version",
+    "np": "np --no-publish --no-yarn --any-branch",
+    "version": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md"
+  },
+  "eslintConfig": {
+    "extends": "xo-space",
+    "env": {
+      "jest": true,
+      "node": true
+    }
+  },
+  "repository": "generator-easydev",
+  "license": "UNLICENSED"
+}
